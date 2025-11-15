@@ -8,4 +8,5 @@ export default {
     text: '#212529',
     success: '#28a745',
     danger: '#dc3545',
+    border: '#d1d5db',
   };
