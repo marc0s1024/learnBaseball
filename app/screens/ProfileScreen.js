@@ -1,5 +1,5 @@
 // screens/ProfileScreen.js
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,6 +26,33 @@ export default function ProfileScreen() {
     { type: 'quiz', title: 'Baseball Basics Quiz', result: '3/5 correct', date: '2 days ago' },
     { type: 'rule', title: 'Learned about Innings', date: '3 days ago' },
     { type: 'position', title: 'Explored Pitcher Role', date: '5 days ago' },
+  ];
+
+  const averageProgress = useMemo(() => {
+    if (progressData.length === 0) return 0;
+    const total = progressData.reduce((sum, item) => sum + item.progress, 0);
+    return Math.round(total / progressData.length);
+  }, [progressData]);
+
+  const achievements = [
+    {
+      id: 'rules',
+      title: 'Rule Rookie',
+      description: 'Score 70% or better understanding the rulebook.',
+      unlocked: progressData.find((item) => item.label === 'Rules')?.progress >= 70,
+    },
+    {
+      id: 'positions',
+      title: 'Diamond Navigator',
+      description: 'Master where every player lines up on the field.',
+      unlocked: progressData.find((item) => item.label === 'Positions')?.progress >= 60,
+    },
+    {
+      id: 'quizzes',
+      title: 'Clutch Performer',
+      description: 'Finish a quiz with at least 80% correct answers.',
+      unlocked: progressData.find((item) => item.label === 'Quizzes')?.progress >= 80,
+    },
   ];
 
   const renderActivityIcon = (type) => {
@@ -55,7 +82,18 @@ export default function ProfileScreen() {
           </View>
           
           <ProgressChart data={progressData} />
-          
+
+          <View style={styles.highlightsCard}>
+            <View style={styles.highlightsHeader}>
+              <Ionicons name="speedometer-outline" size={22} color={Colors.primary} />
+              <Text style={styles.highlightsTitle}>Momentum Tracker</Text>
+            </View>
+            <Text style={styles.highlightsValue}>{averageProgress}% complete</Text>
+            <Text style={styles.highlightsSubtitle}>
+              Keep pushing! Completing quizzes and reading rule summaries fills the progress wheel faster.
+            </Text>
+          </View>
+
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
             {recentActivities.map((activity, index) => (
@@ -71,7 +109,7 @@ export default function ProfileScreen() {
               </View>
             ))}
           </View>
-          
+
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Settings</Text>
             <TouchableOpacity style={styles.settingsButton}>
@@ -89,6 +127,31 @@ export default function ProfileScreen() {
               <Text style={styles.settingsButtonText}>Help & Support</Text>
               <Ionicons name="chevron-forward" size={20} color={Colors.secondary} />
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Achievements</Text>
+            {achievements.map((achievement) => (
+              <View
+                key={achievement.id}
+                style={[styles.achievementItem, achievement.unlocked ? styles.achievementUnlocked : styles.achievementLocked]}
+              >
+                <Ionicons
+                  name={achievement.unlocked ? 'trophy' : 'trophy-outline'}
+                  size={22}
+                  color={achievement.unlocked ? Colors.success : Colors.secondary}
+                />
+                <View style={styles.achievementTextContainer}>
+                  <Text style={styles.achievementTitle}>{achievement.title}</Text>
+                  <Text style={styles.achievementDescription}>{achievement.description}</Text>
+                </View>
+                <Ionicons
+                  name={achievement.unlocked ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={22}
+                  color={achievement.unlocked ? Colors.success : Colors.secondary}
+                />
+              </View>
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -126,13 +189,13 @@ const styles = StyleSheet.create({
     fontSize: 16, 
     marginBottom: 20 
   },
-  button: { 
-    backgroundColor: '#007bff', 
-    padding: 10, 
-    borderRadius: 8 
+  button: {
+    backgroundColor: Colors.primary,
+    padding: 10,
+    borderRadius: 8
   },
-  buttonText: { 
-    color: '#fff', 
+  buttonText: {
+    color: '#fff',
     fontSize: 16 
   },
   section: {
@@ -166,6 +229,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.text
   },
+  highlightsCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  highlightsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  highlightsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  highlightsValue: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: Colors.primary,
+    marginBottom: 6,
+  },
+  highlightsSubtitle: {
+    fontSize: 14,
+    color: Colors.secondary,
+    lineHeight: 20,
+  },
   settingsButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -177,5 +271,33 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     marginLeft: 10
+  },
+  achievementItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  achievementUnlocked: {
+    backgroundColor: '#e9f8ef',
+  },
+  achievementLocked: {
+    backgroundColor: Colors.background,
+  },
+  achievementTextContainer: {
+    flex: 1,
+    marginHorizontal: 12,
+  },
+  achievementTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  achievementDescription: {
+    fontSize: 14,
+    color: Colors.secondary,
   }
 });
