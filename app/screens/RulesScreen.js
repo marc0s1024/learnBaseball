@@ -4,9 +4,31 @@ import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../constants/Colors';
+import CountTracker from '../components/CountTracker';
 
 export default function RulesScreen() {
   const [expandedSection, setExpandedSection] = useState('basics');
+
+  const strategyHighlights = [
+    {
+      id: 'approach',
+      icon: 'analytics-outline',
+      title: 'Work the Count',
+      description: 'Lay off borderline pitches early and force the pitcher to throw a strike you can drive.'
+    },
+    {
+      id: 'defense',
+      icon: 'shield-checkmark-outline',
+      title: 'Defensive Positioning',
+      description: 'Notice the number of outs. With two outs, infielders can play deeper knowing runners go on contact.'
+    },
+    {
+      id: 'baserunning',
+      icon: 'walk-outline',
+      title: 'Smart Baserunning',
+      description: 'Know if the force is on. With fewer than two outs, a ground ball means run hard and slide through the base.'
+    }
+  ];
   
   const rules = {
     basics: [
@@ -89,7 +111,27 @@ export default function RulesScreen() {
       <ScrollView style={styles.container}>
         <Text style={styles.title}>Baseball Rules</Text>
         <Text style={styles.subtitle}>Tap on a section to learn more</Text>
-        
+
+        <CountTracker />
+
+        <View style={styles.strategyCard}>
+          <Text style={styles.strategyTitle}>Situational Strategy</Text>
+          <Text style={styles.strategySubtitle}>
+            Understanding the game state helps you make winning choices on both sides of the ball.
+          </Text>
+          {strategyHighlights.map((item) => (
+            <View key={item.id} style={styles.strategyRow}>
+              <View style={styles.strategyIconCircle}>
+                <Ionicons name={item.icon} size={18} color={Colors.white} />
+              </View>
+              <View style={styles.strategyTextContainer}>
+                <Text style={styles.strategyItemTitle}>{item.title}</Text>
+                <Text style={styles.strategyItemDescription}>{item.description}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
         {renderSection("Basic Rules", "basics", "baseball-outline")}
         {renderSection("Scoring", "scoring", "trophy-outline")}
         {renderSection("Batting", "batting", "golf-outline")}
@@ -191,5 +233,57 @@ const styles = StyleSheet.create({
   footerText: {
     color: Colors.secondary,
     fontSize: 14
+  },
+  strategyCard: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  strategyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  strategySubtitle: {
+    fontSize: 14,
+    color: Colors.secondary,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  strategyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 14,
+  },
+  strategyIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  strategyTextContainer: {
+    flex: 1,
+  },
+  strategyItemTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  strategyItemDescription: {
+    fontSize: 14,
+    color: Colors.text,
+    lineHeight: 20,
   }
 });
